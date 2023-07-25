@@ -11,5 +11,5 @@ class Transaksi extends Model
     public $timestamps = false;
     protected $table="transaksi";
     protected $primaryKey="id_transaksi";
-    protected $fillable=['tgl_transaksi', 'id_user', 'id_meja', 'nama_pelanggan', 'status'];
+    protected $fillable=['tgl_transaksi', 'id_user', 'id_meja', 'nama_pelanggan', 'status', 'total'];
 }

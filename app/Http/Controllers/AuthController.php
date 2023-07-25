@@ -19,7 +19,9 @@ class AuthController extends Controller
             return response()->json(['message' => 'Password Salah'], 401);
         }
         $role = $user->role;
+        $nama_user = $user->nama_user;
+        $id_user = $user->id_user;
 
-        return response()->json(compact('token', 'role'));
+        return response()->json(compact('token', 'role', 'nama_user', 'id_user'));
     }
 }

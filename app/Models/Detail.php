@@ -11,5 +11,5 @@ class Detail extends Model
     public $timestamps = false;
     protected $table="detail_transaksi";
     protected $primaryKey="id_detail_transaksi";
-    protected $fillable=['id_transaksi', 'id_menu', 'qty', 'total'];
+    protected $fillable=['id_transaksi', 'id_menu', 'qty', 'subtotal'];
 }

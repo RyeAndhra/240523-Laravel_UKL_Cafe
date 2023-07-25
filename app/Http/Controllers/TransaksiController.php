@@ -23,6 +23,7 @@ class TransaksiController extends Controller
                 'transaksi.tgl_transaksi',
                 'transaksi.nama_pelanggan',
                 'transaksi.status',
+                'transaksi.total',
                 'user.id_user',
                 'user.nama_user',
                 'user.role',
@@ -39,19 +40,21 @@ class TransaksiController extends Controller
         $transaksi = Transaksi::where('id_transaksi', $id)
             ->join('user', 'user.id_user', '=', 'transaksi.id_user')
             ->join('meja', 'meja.id_meja', '=', 'transaksi.id_meja')
-            ->select('transaksi.id_transaksi', 'meja.id_meja', 'transaksi.tgl_transaksi', 'user.nama_user', 'meja.nomor_meja', 'transaksi.nama_pelanggan', 'transaksi.status')
+            ->select('transaksi.id_transaksi', 'meja.id_meja', 'transaksi.tgl_transaksi', 'user.nama_user', 'meja.nomor_meja', 'transaksi.nama_pelanggan', 'transaksi.status', 'transaksi.total')
             ->get();
         return response()->json($transaksi);
     }
 
     public function createtransaksi(Request $req)
     {
+        $total = $req->get('total');
         $transaksi = Transaksi::create([
             'tgl_transaksi' => Carbon::now(),
             'id_user' => $req->get('id_user'),
             'id_meja' => $req->get('id_meja'),
             'nama_pelanggan' => $req->get('nama_pelanggan'),
-            'status' => 'Pending'
+            'status' => 'Pending',
+            'total' => $total
         ]);
         if (!$transaksi) {
             return response()->json(['status' => false, 'message' => 'Gagal Membuat Pesanan']);
@@ -63,7 +66,7 @@ class TransaksiController extends Controller
                 'id_transaksi' => $transaksi->id_transaksi,
                 'id_menu' => $item['id_menu'],
                 'qty' => $item['quantity'],
-                'total' => $item['quantity'] * $item['harga']
+                'subtotal' => $item['quantity'] * $item['harga']
             ]);
             $menu = Menu::find($item['id_menu']);
             $jumlahPesan = $menu->jumlah_pesan + $item['quantity'];
@@ -118,7 +121,7 @@ class TransaksiController extends Controller
         $detail = Detail::where('transaksi.id_transaksi', $id)
             ->join('transaksi', 'detail_transaksi.id_transaksi', '=', 'transaksi.id_transaksi')
             ->join('menu', 'detail_transaksi.id_menu', '=', 'menu.id_menu')
-            ->select('transaksi.id_transaksi', 'detail_transaksi.id_detail_transaksi', 'detail_transaksi.qty', 'detail_transaksi.total', 'menu.nama_menu')
+            ->select('transaksi.id_transaksi', 'detail_transaksi.id_detail_transaksi', 'detail_transaksi.qty', 'detail_transaksi.subtotal', 'menu.nama_menu')
             ->get();
         return response()->json($detail);
     }
@@ -131,7 +134,7 @@ class TransaksiController extends Controller
         $totalIncomeToday = Transaksi::where('tgl_transaksi', $today)
             ->where('status', 'Lunas')
             ->join('detail_transaksi', 'transaksi.id_transaksi', '=', 'detail_transaksi.id_transaksi')
-            ->sum('detail_transaksi.total');
+            ->sum('detail_transaksi.subtotal');
         return response()->json(['total_income_today' => $totalIncomeToday]);
     }
 
