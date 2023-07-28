@@ -31,6 +31,7 @@ class TransaksiController extends Controller
                 'meja.id_meja',
                 'meja.nomor_meja',
             )
+            ->orderBy('id_transaksi','desc')
             ->get();
         return response()->json($transaksi);
     }
@@ -154,7 +155,7 @@ class TransaksiController extends Controller
             $query->whereYear('transaksi.tgl_transaksi', $year)
                 ->whereMonth('transaksi.tgl_transaksi', $month);
         }
-        $totalIncome = $query->sum('detail_transaksi.total');
+        $totalIncome = $query->sum('detail_transaksi.subtotal');
         return response()->json(['total_income' => $totalIncome]);
     }
 }
